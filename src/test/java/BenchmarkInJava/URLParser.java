@@ -28,11 +28,15 @@ public class URLParser {
     public String getRequestPath() {
         return  url.getPath();
     }
-    public static void main(String[] args) throws MalformedURLException {
+    public static void main(String[] args) throws MalformedURLException, InterruptedException {
         URLParser urlParser=new URLParser("http://localhost/");
         System.out.println(urlParser.getHost());
         System.out.println(urlParser.getPort());
         System.out.println(urlParser.getRequestPath());
+        System.out.println(System.currentTimeMillis());
+        Thread.sleep(50);
+        System.out.println(System.currentTimeMillis());
+
     }
 
 }
