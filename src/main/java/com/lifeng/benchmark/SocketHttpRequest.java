@@ -1,9 +1,6 @@
 package com.lifeng.benchmark;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
+import java.io.*;
 import java.net.Socket;
 import java.net.URL;
 
@@ -16,11 +13,14 @@ import java.net.URL;
  */
 public class SocketHttpRequest extends Thread {
     private String url;
-    int n=0;
+    int n;
+    public TimeStatic[] timeStatics;
+
     public SocketHttpRequest(String url,int n){
         this.url=url;
         this.n=n;
-        super.setName(url);
+        this.timeStatics=new TimeStatic[n];
+       // super.setName(url);
     }
 
     @Override
@@ -28,6 +28,7 @@ public class SocketHttpRequest extends Thread {
         //To change body of implemented methods use File | Settings | File Templates.
         for(int i=0;i<n;i++) {
         try {
+            timeStatics[i].setUrl(url);
             URL urlconnection = new URL(url);
             String host=urlconnection.getHost();
             int port=urlconnection.getPort()==-1 ? urlconnection.getDefaultPort():urlconnection.getPort();
@@ -40,19 +41,26 @@ public class SocketHttpRequest extends Thread {
             //注，这是关键的关键，忘了这里让我搞了半个小时。这里一定要一个回车换行，表示消息头完，不然服务器会等待
             sb.append("\r\n");
 
-
             //begin connect time
             //start of connect
+            timeStatics[i].setConnectStartTime(System.nanoTime());
             Socket client = new Socket(host,port);
             //end of connect
+            timeStatics[i].setConnectEndTime(System.nanoTime());
             OutputStreamWriter request = new OutputStreamWriter(client.getOutputStream());
+            //start writetime
+            timeStatics[i].setWriteRequestTime(System.nanoTime());
             request.write(sb.toString());
             request.flush();
             //end write
-            BufferedReader read = new BufferedReader(new InputStreamReader(client.getInputStream()));
+            InputStream clientInputStream=client.getInputStream();
+            //responce time
+            timeStatics[i].setResponceTime(System.nanoTime());
+            BufferedReader read = new BufferedReader(new InputStreamReader(clientInputStream));
             String[] line=read.readLine().split(" ");
             //read time and send time
-            System.out.println(line[1]);
+
+            timeStatics[i].setStatus(line[1]);
             client.close();
         } catch (IOException e) {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.

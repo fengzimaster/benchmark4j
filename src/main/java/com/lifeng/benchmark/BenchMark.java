@@ -1,5 +1,10 @@
 package com.lifeng.benchmark;
 
+import org.apache.commons.cli.BasicParser;
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.ParseException;
+
 import java.io.*;
 import java.net.Socket;
 
@@ -15,19 +20,34 @@ public class BenchMark {
         int n=1;
         int corruncy=1;
         int firstWeb=0;
-        if (args.length>1&&args[0].equals("-n")) {
-            n=Integer.parseInt(args[1]);
-            firstWeb += 2;
+        int urlNum=0;
+        CommandLineParser parser=new BasicParser();
+        try {
+            CommandLine line=parser.parse(new BenchmarkOption().benchmarkOption,args);
+            if (line.hasOption("n")) {
+                n=Integer.parseInt(line.getOptionValue("n"));
+                firstWeb+=2;
+            }
+            if(line.hasOption("c")){
+                corruncy=Integer.parseInt(line.getOptionValue("c"));
+                firstWeb+=2;
+            }
+            if(line.hasOption("u")){
+                urlNum=Integer.parseInt(line.getOptionValue("u"));
+            }
+        } catch (ParseException e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
         }
-        if(args.length>3&&args[2].equals("-c")){
-           corruncy=Integer.parseInt(args[3]);
-            firstWeb +=2;
-        }
+
+
+        Thread[] CurruncyVisits=new Thread[corruncy];
         for(int i=firstWeb;i<args.length;i++){
                for(int j=0;j<corruncy;j++){
-                      new SocketHttpRequest(args[i],n);
+                      CurruncyVisits[j]=new SocketHttpRequest(args[i],n);
                }
         }
+        //all subThread complish,then main thread run
+
 
 
 
