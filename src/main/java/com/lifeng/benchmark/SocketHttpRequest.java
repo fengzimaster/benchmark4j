@@ -3,6 +3,7 @@ package com.lifeng.benchmark;
 import java.io.*;
 import java.net.Socket;
 import java.net.URL;
+import java.util.concurrent.CountDownLatch;
 
 /**
  * Created with IntelliJ IDEA.
@@ -13,13 +14,15 @@ import java.net.URL;
  */
 public class SocketHttpRequest extends Thread {
     private String url;
-    int n;
+    private int n;
     public TimeStatic[] timeStatics;
+    private CountDownLatch downLatch;
 
-    public SocketHttpRequest(String url,int n){
+    public SocketHttpRequest(String url,int n,CountDownLatch downLatch){
         this.url=url;
         this.n=n;
         this.timeStatics=new TimeStatic[n];
+        this.downLatch=downLatch;
        // super.setName(url);
     }
 
@@ -34,11 +37,11 @@ public class SocketHttpRequest extends Thread {
             int port=urlconnection.getPort()==-1 ? urlconnection.getDefaultPort():urlconnection.getPort();
             String path=urlconnection.getPath();
 
-            //构造http request
+            //make http request
             StringBuffer sb =new StringBuffer();
             sb.append("GET / HTTP/1.1\r\n");
             sb.append("Host: "+host+":"+port+"\r\n");
-            //注，这是关键的关键，忘了这里让我搞了半个小时。这里一定要一个回车换行，表示消息头完，不然服务器会等待
+            // add a \r\n to complete the request
             sb.append("\r\n");
 
             //begin connect time
@@ -62,13 +65,10 @@ public class SocketHttpRequest extends Thread {
 
             timeStatics[i].setStatus(line[1]);
             client.close();
+            this.downLatch.countDown();
         } catch (IOException e) {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
         }
         }
-    }
-    public static void main(String[] args){
-        SocketHttpRequest a=new SocketHttpRequest("lifeng",1);
-
     }
 }

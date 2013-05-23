@@ -13,9 +13,9 @@ import org.apache.commons.cli.Options;
 public class BenchmarkOption {
        Options benchmarkOption=new Options();
        public BenchmarkOption(){
-           Option numberOfVisit=new Option("n","input the number of visit times of the same url,defalt is 1");
-           Option currencyOfVisit=new Option("c","input the number of curency of visit the same url,defalt is 1");
-           Option urlToVisit=new Option("u","input the number of url you will test,defalt is 0");
+           Option numberOfVisit=new Option("n",false,"input the number of visit times of the same url,defalt is 1");
+           Option currencyOfVisit=new Option("c",false,"input the number of curency of visit the same url,defalt is 1");
+           Option urlToVisit=new Option("u",false,"input the number of url you will test,defalt is 0");
            benchmarkOption.addOption(numberOfVisit);
            benchmarkOption.addOption(currencyOfVisit);
            benchmarkOption.addOption(urlToVisit);
